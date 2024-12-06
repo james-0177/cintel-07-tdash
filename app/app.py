@@ -1,3 +1,7 @@
+# ------------------------------------------------
+# List imports
+#-------------------------------------------------
+
 import seaborn as sns
 from faicons import icon_svg
 
@@ -5,12 +9,23 @@ from shiny import reactive
 from shiny.express import input, render, ui
 import palmerpenguins 
 
+# ------------------------------------------------
+# Get the Data
+#-------------------------------------------------
+
 df = palmerpenguins.load_penguins()
 
-ui.page_opts(title="Penguins Dashboard", fillable=True)
+# ------------------------------------------------
+# Define the Shiny UI Page layout - Page Options
+# ------------------------------------------------
 
+ui.page_opts(title="Penguins Dashboard", fillable=True, style="background-color: silver")
 
-with ui.sidebar(title="Filter Controls"):
+# ------------------------------------------------
+# Define the Shiny UI Page layout - Sidebar
+# ------------------------------------------------
+
+with ui.sidebar(title="Filter Controls", bg="silver"):
     ui.input_slider("mass", "Mass", 2000, 6000, 6000)
     ui.input_checkbox_group(
         "species",
@@ -47,23 +62,24 @@ with ui.sidebar(title="Filter Controls"):
         target="_blank",
     )
 
+# Main Content
 
 with ui.layout_column_wrap(fill=False):
-    with ui.value_box(showcase=icon_svg("earlybirds")):
+    with ui.value_box(showcase=icon_svg("earlybirds"), theme="bg-blue"):
         "Number of Penguins"
 
         @render.text
         def count():
             return filtered_df().shape[0]
 
-    with ui.value_box(showcase=icon_svg("ruler-horizontal")):
+    with ui.value_box(showcase=icon_svg("ruler-horizontal"), theme="bg-blue"):
         "Average Bill Length"
 
         @render.text
         def bill_length():
             return f"{filtered_df()['bill_length_mm'].mean():.1f} mm"
 
-    with ui.value_box(showcase=icon_svg("ruler-vertical")):
+    with ui.value_box(showcase=icon_svg("ruler-vertical"), theme="bg-blue"):
         "Average Bill Depth"
 
         @render.text
@@ -98,9 +114,15 @@ with ui.layout_columns():
             ]
             return render.DataGrid(filtered_df()[cols], filters=True)
 
+#---------------------------------------------------------------------
+# In Shiny Express, everything not in the sidebar is in the main panel
+#---------------------------------------------------------------------
 
 #ui.include_css(app_dir / "styles.css")
 
+# -------------------------------------------------
+# Reactive calculations and effects
+# -------------------------------------------------
 
 @reactive.calc
 def filtered_df():
